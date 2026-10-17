@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f7f4">
+<title>Daylight — gentle focus</title>
+<style>
+:root{color-scheme:light;--bg:#f6f7f4;--panel:#fff;--text:#20251f;--muted:#7c837b;--line:#e7eae4;--green:#4b8b63;--green2:#e5f2e8;--shadow:0 10px 35px #2633230b;--input:#f7f8f5}
+[data-theme="dark"]{color-scheme:dark;--bg:#111512;--panel:#1b211d;--text:#edf3ed;--muted:#a0aaa1;--line:#303a32;--green:#8bd6a1;--green2:#263d2e;--shadow:0 10px 35px #0005;--input:#242c26}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:background .2s,color .2s}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #86c99a;outline-offset:2px}
+.app{max-width:650px;margin:auto;padding:env(safe-area-inset-top) 18px calc(28px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 16px}
+.brand{display:flex;gap:10px;align-items:center;font-weight:750;letter-spacing:-.04em;font-size:21px}
+.logo{display:grid;place-items:center;width:34px;height:34px;background:var(--green2);border-radius:12px;color:var(--green);font-size:20px}
+.head-actions{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border:1px solid var(--line);background:var(--panel);border-radius:14px;color:var(--text);font-size:18px}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:750}
+.hero{padding:15px 0 20px}
+.hero h1{font-size:clamp(30px,8vw,42px);line-height:1.06;letter-spacing:-.055em;margin:7px 0 9px}
+.hero p{margin:0;color:var(--muted)}
+.progress-card,.timer-card,.task-card,.settings-card{background:var(--panel);border:1px solid var(--line);border-radius:23px;box-shadow:var(--shadow)}
+.progress-card{padding:18px;margin-bottom:14px}
+.progress-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.progress-count{font-weight:750;font-size:15px}
+.up-mark{display:inline-flex;align-items:center;gap:6px;background:var(--green2);color:var(--green);border-radius:999px;padding:7px 10px;font-size:13px;font-weight:800}
+.bar{height:8px;background:var(--line);border-radius:99px;margin-top:14px;overflow:hidden}
+.bar-fill{height:100%;width:0;background:var(--green);border-radius:99px;transition:width .35s cubic-bezier(.2,.8,.2,1)}
+.timer-card{padding:18px;margin-bottom:20px}
+.section-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-heading h2{font-size:17px;letter-spacing:-.025em;margin:0}
+.small-muted{font-size:12px;color:var(--muted)}
+.time-inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.time-unit label{display:block;font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.1em;margin:0 0 6px 3px}
+.time-unit input{width:100%;background:var(--input);border:1px solid var(--line);border-radius:15px;padding:13px 6px;text-align:center;color:var(--text);font-size:24px;font-weight:750;min-width:0}
+.timer-actions{display:flex;gap:9px;margin-top:12px}
+.primary,.secondary,.quiet{border:0;border-radius:14px;padding:12px 15px;font-weight:750}
+.primary{background:var(--green);color:white;flex:1}
+.secondary{background:var(--green2);color:var(--green)}
+.quiet{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.timer-readout{font-size:12px;color:var(--muted);margin-top:9px;min-height:18px}
+.list-head{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
+.list-head h2{font-size:20px;letter-spacing:-.04em;margin:0}
+.task-list{display:grid;gap:10px}
+.task-card{padding:14px;display:flex;gap:12px;align-items:center;transition:transform .18s,border-color .18s}
+.task-card.done{opacity:.74}
+.check{flex:0 0 27px;width:27px;height:27px;border:1.8px solid #b8c2b9;border-radius:10px;background:transparent;color:white;display:grid;place-items:center;font-size:17px;padding:0}
+.done .check{background:var(--green);border-color:var(--green)}
+.task-main{flex:1;min-width:0}
+.task-title{font-weight:720;letter-spacing:-.02em;overflow-wrap:anywhere}
+.done .task-title{text-decoration:line-through;color:var(--muted)}
+.task-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:4px;color:var(--muted);font-size:12px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.intensity{border-radius:7px;padding:2px 6px;background:var(--input);border:1px solid var(--line)}
+.task-actions{display:flex;gap:5px}
+.tiny-btn{border:0;background:transparent;color:var(--muted);padding:8px;border-radius:10px;font-size:17px}
+.empty{padding:30px 15px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:20px}
+.bottom-note{text-align:center;font-size:12px;color:var(--muted);padding:23px 5px 5px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--text);color:var(--bg);padding:12px 17px;border-radius:999px;box-shadow:var(--shadow);font-size:14px;font-weight:700;transition:all .22s;z-index:5;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal-backdrop{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:10}
+.modal-backdrop.open{display:flex}
+.modal{width:min(100%,560px);max-height:90dvh;overflow:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:26px;padding:20px;box-shadow:0 20px 80px #0003}
+.modal h2{margin:0 0 18px;font-size:23px;letter-spacing:-.04em}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}
+.field input[type=text],.field select,.field input[type=number]{width:100%;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:13px;padding:12px}
+.field small{display:block;color:var(--muted);margin-top:5px;font-size:12px}
+.inline-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.field input[type=checkbox]{accent-color:var(--green);width:18px;height:18px;vertical-align:middle;margin-right:8px}
+.modal-actions{display:flex;gap:9px;margin-top:20px}
+.modal-actions>*{flex:1}
+.sound-row{display:flex;gap:8px;flex-wrap:wrap}
+.sound-chip{border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:12px;padding:9px 12px}
+.sound-chip.active{border-color:var(--green);background:var(--green2);color:var(--green)}
+.celebrate{animation:pop .42s cubic-bezier(.2,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media(min-width:600px){.app{padding-left:24px;padding-right:24px}.modal-backdrop{align-items:center}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header>
+<div class="brand"><span class="logo">✳</span> daylight</div>
+<div class="head-actions">
+<button class="icon-btn" id="soundTest" aria-label="Test sound" title="Test sound">♫</button>
+<button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Dark mode">☾</button>
+<button class="icon-btn" id="settingsOpen" aria-label="Settings" title="Settings">⚙</button>
+</div>
+</header>
+
+<section class="hero">
+<div class="eyebrow" id="todayLabel">A little progress, every day</div>
+<h1>Make room for<br>what matters.</h1>
+<p>One thing at a time. You’ve got this.</p>
+</section>
+
+<section class="progress-card">
+<div class="progress-top">
+<div>
+<div class="eyebrow">Today’s progress</div>
+<div class="progress-count" id="progressCount">0 of 0 completed</div>
+</div>
+<span class="up-mark" id="progressMark">↗ <span id="progressPercent">0%</span></span>
+</div>
+<div class="bar"><div class="bar-fill" id="progressFill"></div></div>
+</section>
+
+<section class="timer-card">
+<div class="section-heading">
+<h2>Focus timer</h2>
+<span class="small-muted" id="timerStatus">Ready when you are</span>
+</div>
+<div class="time-inputs">
+<div class="time-unit"><label for="timerHours">Hours</label><input id="timerHours" type="number" min="0" max="99" inputmode="numeric" value="0" aria-label="Hours"></div>
+<div class="time-unit"><label for="timerMinutes">Minutes</label><input id="timerMinutes" type="number" min="0" max="59" inputmode="numeric" value="25" aria-label="Minutes"></div>
+<div class="time-unit"><label for="timerSeconds">Seconds</label><input id="timerSeconds" type="number" min="0" max="59" inputmode="numeric" value="0" aria-label="Seconds"></div>
+</div>
+<div class="timer-actions"><button class="primary" id="timerStart">Start focus</button><button class="quiet" id="timerReset">Reset</button></div>
+<div class="timer-readout" id="timerReadout">Set your duration above. Keep this page open for the most reliable timer alert.</div>
+</section>
+
+<div class="list-head"><h2>Your checklist</h2><button class="secondary" id="addTask">＋ Add task</button></div>
+<div class="task-list" id="taskList"></div>
+<div class="bottom-note">Small steps count. Be kind to yourself today. ✳<br>For reliable reminders, allow notifications and keep the app open.</div>
+</div>
+
+<div class="toast" id="toast">✓ Nice work!</div>
+
+<div class="modal-backdrop" id="taskModal">
+<div class="modal">
+<h2 id="taskModalTitle">Add a task</h2>
+<div class="field"><label for="taskName">Task name</label><input id="taskName" type="text" maxlength="90" placeholder="e.g. Revise organic chemistry"></div>
+<div class="field">
+<label>Reminder time (24-hour clock)</label>
+<div class="inline-fields">
+<div class="time-unit"><label for="remHour">Hour</label><input id="remHour" type="number" min="0" max="23" value="18"></div>
+<div class="time-unit"><label for="remMin">Minute</label><input id="remMin" type="number" min="0" max="59" value="0"></div>
+<div class="time-unit"><label for="remSec">Second</label><input id="remSec" type="number" min="0" max="59" value="0"></div>
+</div>
+<small>Set hour, minute and second separately—no fiddly clock dial.</small>
+</div>
+<div class="field"><label for="taskIntensity">Reminder style</label><select id="taskIntensity"><option value="Gentle">Gentle — soft nudge</option><option value="Firm">Firm — clear reminder</option><option value="Strict">Strict — stronger nudge</option></select></div>
+<div class="field"><label for="taskSound">Sound</label><select id="taskSound"><option value="chime">Daylight chime</option><option value="bell">Bright bell</option><option value="pulse">Three-note pulse</option><option value="off">Silent</option></select><small>Sounds are generated directly by your device; use Test sound to check volume.</small></div>
+<div class="field"><label><input id="taskVibrate" type="checkbox" checked> Haptic sweep on reminder and completion</label></div>
+<div class="modal-actions"><button class="quiet" id="taskCancel">Cancel</button><button class="primary" id="taskSave">Save task</button></div>
+</div>
+</div>
+
+<div class="modal-backdrop" id="settingsModal">
+<div class="modal">
+<h2>Daylight settings</h2>
+<div class="field"><label for="defaultSound">Default sound</label><select id="defaultSound"><option value="chime">Daylight chime</option><option value="bell">Bright bell</option><option value="pulse">Three-note pulse</option><option value="off">Silent</option></select></div>
+<div class="field"><label for="defaultVibrate"><input id="defaultVibrate" type="checkbox" checked> Use vibration when supported</label></div>
+<div class="field"><label for="notifyEnabled"><input id="notifyEnabled" type="checkbox"> Allow browser notifications</label><small>Notifications may be limited by your browser or Android battery settings. This web version cannot guarantee alarms while fully closed or the phone is locked.</small></div>
+<div class="field"><button class="secondary" id="requestNotify">Enable notifications</button> <button class="quiet" id="testSettingsSound">Test sound + vibration</button></div>
+<div class="modal-actions"><button class="quiet" id="settingsClose">Close</button><button class="primary" id="settingsSave">Save settings</button></div>
+</div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const storeKey='daylight-final-v1';
+const defaults=[
+{id:'d1',name:'Plan the day',h:8,m:0,s:0,intensity:'Gentle',sound:'chime',vibrate:true,done:false},
+{id:'d2',name:'Focused study session',h:16,m:30,s:0,intensity:'Firm',sound:'bell',vibrate:true,done:false},
+{id:'d3',name:'Take a proper break',h:19,m:0,s:0,intensity:'Gentle',sound:'pulse',vibrate:true,done:false}
+];
+let data={tasks:defaults,theme:'light',settings:{sound:'chime',vibrate:true,notifications:false}};
+try{
+const old=JSON.parse(localStorage.getItem(storeKey)||'null');
+if(old&&Array.isArray(old.tasks))data={...data,...old,settings:{...data.settings,...old.settings}};
+}catch(e){}
+let editingId=null,timerInterval=null,timerEnd=0,timerRemaining=0,lastReminderMinute='';
+const pad=n=>String(n).padStart(2,'0');
+
+function save(){
+try{localStorage.setItem(storeKey,JSON.stringify(data))}catch(e){}
+}
+function applyTheme(){
+document.documentElement.dataset.theme=data.theme;
+$('themeToggle').textContent=data.theme==='dark'?'☀':'☾';
+$('themeToggle').title=data.theme==='dark'?'Light mode':'Dark mode';
+document.querySelector('meta[name="theme-color"]').content=data.theme==='dark'?'#111512':'#f6f7f4';
+}
+function timeText(t){return `${pad(t.h)}:${pad(t.m)}:${pad(t.s||0)}`}
+
+function render(){
+const list=$('taskList');
+list.innerHTML='';
+data.tasks.forEach(t=>{
+const card=document.createElement('div');
+card.className='task-card'+(t.done?' done':'');
+card.innerHTML=`<button class="check" aria-label="${t.done?'Mark incomplete':'Complete task'}">${t.done?'✓':''}</button><div class="task-main"><div class="task-title"></div><div class="task-meta"><span class="dot"></span><span class="time"></span><span class="intensity"></span></div></div><div class="task-actions"><button class="tiny-btn edit" aria-label="Edit task" title="Edit">✎</button><button class="tiny-btn delete" aria-label="Delete task" title="Delete">×</button></div>`;
+card.querySelector('.task-title').textContent=t.name;
+card.querySelector('.time').textContent=timeText(t);
+card.querySelector('.intensity').textContent=t.intensity;
+card.querySelector('.check').onclick=()=>toggleTask(t.id);
+card.querySelector('.edit').onclick=()=>openTask(t.id);
+card.querySelector('.delete').onclick=()=>{
+if(confirm('Delete this task?')){
+data.tasks=data.tasks.filter(x=>x.id!==t.id);
+save();render();
+}
+};
+list.appendChild(card);
+});
+if(!data.tasks.length)list.innerHTML='<div class="empty">Your list is clear. Add one small thing you’d like to do today. ✳</div>';
+const done=data.tasks.filter(t=>t.done).length,total=data.tasks.length,pct=total?Math.round(done/total*100):0;
+$('progressCount').textContent=`${done} of ${total} completed`;
+$('progressPercent').textContent=pct+'%';
+$('progressFill').style.width=pct+'%';
+$('progressMark').classList.toggle('celebrate',pct>0);
+const date=new Date();
+$('todayLabel').textContent=date.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+}
+
+function toast(msg){
+const el=$('toast');
+el.textContent=msg;
+el.classList.add('show');
+clearTimeout(toast._t);
+toast._t=setTimeout(()=>el.classList.remove('show'),2200);
+}
+function vibrate(pattern=[12,18,18,22,28]){
+if(navigator.vibrate)try{navigator.vibrate(pattern)}catch(e){}
+}
+let audioCtx=null;
+function audioContext(){
+const AC=window.AudioContext||window.webkitAudioContext;
+if(!AC)return null;
+if(!audioCtx)audioCtx=new AC();
+if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+return audioCtx;
+}
+function playSound(kind='chime',strength='Firm'){
+if(kind==='off')return;
+const ctx=audioContext();
+if(!ctx){toast('Sound is unavailable in this browser');return}
+const now=ctx.currentTime;
+const master=ctx.createGain();
+master.gain.setValueAtTime(strength==='Strict'?.32:strength==='Gentle'?.14:.24,now);
+master.connect(ctx.destination);
+let notes=kind==='bell'?[880,1175]:kind==='pulse'?[523,659,784]:[659,784,988,784];
+let durations=kind==='bell'?[.20,.42]:kind==='pulse'?[.18,.18,.32]:[.14,.14,.24,.30];
+let at=now;
+notes.forEach((freq,i)=>{
+const osc=ctx.createOscillator(),gain=ctx.createGain();
+osc.type=kind==='bell'?'sine':'triangle';
+osc.frequency.setValueAtTime(freq,at);
+gain.gain.setValueAtTime(.0001,at);
+gain.gain.exponentialRampToValueAtTime(1,at+.018);
+gain.gain.exponentialRampToValueAtTime(.0001,at+durations[i]);
+osc.connect(gain);gain.connect(master);
+osc.start(at);osc.stop(at+durations[i]+.025);
+at+=durations[i]*.72;
+});
+}
+function toggleTask(id){
+const t=data.tasks.find(x=>x.id===id);
+if(!t)return;
+t.done=!t.done;save();render();
+if(t.done){
+if(t.vibrate!==false&&data.settings.vibrate)vibrate([10,18,12,24,24,32]);
+playSound(t.sound||data.settings.sound,'Gentle');
+toast('👍 Lovely work — one step forward');
+$('progressMark').classList.remove('celebrate');
+void $('progressMark').offsetWidth;
+$('progressMark').classList.add('celebrate');
+}else toast('Task reopened');
+}
+function openTask(id=null){
+editingId=id;
+const t=id?data.tasks.find(x=>x.id===id):null;
+$('taskModalTitle').textContent=t?'Edit task':'Add a task';
+$('taskName').value=t?.name||'';
+$('remHour').value=t?.h??18;
+$('remMin').value=t?.m??0;
+$('remSec').value=t?.s??0;
+$('taskIntensity').value=t?.intensity||'Gentle';
+$('taskSound').value=t?.sound||data.settings.sound;
+$('taskVibrate').checked=t?.vibrate??data.settings.vibrate;
+$('taskModal').classList.add('open');
+setTimeout(()=>$('taskName').focus(),100);
+}
+function closeTask(){$('taskModal').classList.remove('open')}
+$('addTask').onclick=()=>openTask();
+$('taskCancel').onclick=closeTask;
+
+$('taskSave').onclick=()=>{
+const name=$('taskName').value.trim();
+if(!name){$('taskName').focus();toast('Give your task a name first');return}
+const t={
+id:editingId||('t'+Date.now()),name,
+h:clamp($('remHour').value,0,23),
+m:clamp($('remMin').value,0,59),
+s:clamp($('remSec').value,0,59),
+intensity:$('taskIntensity').value,
+sound:$('taskSound').value,
+vibrate:$('taskVibrate').checked,
+done:editingId?(data.tasks.find(x=>x.id===editingId)?.done||false):false
+};
+if(editingId)data.tasks=data.tasks.map(x=>x.id===editingId?t:x);
+else data.tasks.push(t);
+save();render();closeTask();toast('Task saved ✳');
+};
+function clamp(v,min,max){
+v=Number.parseInt(v,10);
+if(!Number.isFinite(v))v=0;
+return Math.max(min,Math.min(max,v));
+}
+$('themeToggle').onclick=()=>{
+data.theme=data.theme==='dark'?'light':'dark';
+applyTheme();save();
+};
+$('soundTest').onclick=()=>{
+playSound(data.settings.sound,'Firm');
+if(data.settings.vibrate)vibrate([12,18,18,22,28]);
+toast('Sound + haptic preview');
+};
+$('settingsOpen').onclick=()=>{
+$('defaultSound').value=data.settings.sound;
+$('defaultVibrate').checked=data.settings.vibrate;
+$('notifyEnabled').checked=data.settings.notifications;
+$('settingsModal').classList.add('open');
+};
+$('settingsClose').onclick=()=>$('settingsModal').classList.remove('open');
+$('settingsSave').onclick=()=>{
+data.settings.sound=$('defaultSound').value;
+data.settings.vibrate=$('defaultVibrate').checked;
+data.settings.notifications=$('notifyEnabled').checked;
+save();$('settingsModal').classList.remove('open');toast('Settings saved');
+};
+$('requestNotify').onclick=async()=>{
+if(!('Notification'in window)){toast('Notifications are not supported here');return}
+try{
+const p=await Notification.requestPermission();
+data.settings.notifications=p==='granted';
+$('notifyEnabled').checked=data.settings.notifications;
+save();toast(p==='granted'?'Notifications enabled':'Permission not granted');
+}catch(e){toast('Could not enable notifications')}
+};
+$('testSettingsSound').onclick=()=>{
+playSound($('defaultSound').value,'Firm');
+if($('defaultVibrate').checked)vibrate([12,18,18,22,28]);
+toast('Preview played');
+};
+$('taskModal').addEventListener('click',e=>{if(e.target===$('taskModal'))closeTask()});
+$('settingsModal').addEventListener('click',e=>{if(e.target===$('settingsModal'))$('settingsModal').classList.remove('open')});
+
+function durationInput(){
+return clamp($('timerHours').value,0,99)*3600+clamp($('timerMinutes').value,0,59)*60+clamp($('timerSeconds').value,0,59);
+}
+function showTimer(seconds){
+seconds=Math.max(0,Math.floor(seconds));
+const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;
+return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+function stopTimer(){
+if(timerInterval)clearInterval(timerInterval);
+timerInterval=null;
+}
+function timerTick(){
+const remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));
+timerRemaining=remaining;
+$('timerReadout').textContent=showTimer(remaining)+' remaining';
+$('timerStatus').textContent='Focus in progress';
+$('timerStart').textContent='Pause timer';
+if(remaining<=0){
+stopTimer();
+$('timerStatus').textContent='Session complete';
+$('timerStart').textContent='Start again';
+$('timerReadout').textContent='Time is up — nice focus. 👍';
+playSound(data.settings.sound,'Firm');
+if(data.settings.vibrate)vibrate([15,25,15,35,25,45]);
+toast('👍 Focus session complete!');
+}
+}
+$('timerStart').onclick=()=>{
+if(timerInterval){
+timerRemaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));
+stopTimer();
+$('timerStatus').textContent='Paused';
+$('timerStart').textContent='Resume focus';
+$('timerReadout').textContent=showTimer(timerRemaining)+' paused';
+return;
+}
+let secs=timerRemaining>0?timerRemaining:durationInput();
+if(secs<=0){toast('Set a duration first');return}
+timerEnd=Date.now()+secs*1000;
+timerInterval=setInterval(timerTick,250);
+timerTick();
+};
+$('timerReset').onclick=()=>{
+stopTimer();timerRemaining=0;
+$('timerStatus').textContent='Ready when you are';
+$('timerStart').textContent='Start focus';
+$('timerReadout').textContent='Set your duration above. Keep this page open for the most reliable timer alert.';
+};
+function reminderCheck(){
+if(document.visibilityState!=='visible')return;
+const d=new Date(),minute=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${d.getHours()}-${d.getMinutes()}`;
+if(minute===lastReminderMinute)return;
+lastReminderMinute=minute;
+data.tasks.filter(t=>!t.done&&t.h===d.getHours()&&t.m===d.getMinutes()&&Number(t.s||0)===0).forEach(t=>{
+playSound(t.sound||data.settings.sound,t.intensity);
+if(t.vibrate!==false&&data.settings.vibrate)vibrate(t.intensity==='Strict'?[25,30,25,35,25,40]:t.intensity==='Firm'?[15,22,15,28]:[10,20,16]);
+if(data.settings.notifications&&'Notification'in window&&Notification.permission==='granted')new Notification('Daylight reminder',{body:t.name,tag:t.id});
+toast('Reminder: '+t.name);
+});
+}
+applyTheme();
+render();
+setInterval(reminderCheck,1000);
+})();
+</script>
+</body>
+</html>
